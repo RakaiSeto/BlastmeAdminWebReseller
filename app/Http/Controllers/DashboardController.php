@@ -18,11 +18,15 @@ class DashboardController extends Controller
         $title = "Dashboard";
         $description = "Some description for the page";
 
-        $res = DB::select('SELECT wallet FROM mt_user_reseller WHERE email = "' . $request->session()->get('sessionEmail') . '"');
+        $res = DB::select('SELECT COUNT(id_device) as count FROM mt_device WHERE reseller_user_allocation != "ROOT"');
+        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0');
+        $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
+        $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
+
 
         $harini = 0;
 
-        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->wallet)->with('hariini', $harini);
+        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('trx_today', $trx_today[0]->count)->with('trx_all', $trx_all[0]->count);
     }
 
     function nodes(Request $request) {

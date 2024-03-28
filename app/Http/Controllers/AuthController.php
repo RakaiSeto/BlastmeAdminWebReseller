@@ -111,8 +111,6 @@ class AuthController extends Controller {
             $session = $payloadArray[0] . "|" . $res[0]->id . "|" . $res[0]->nama . "|" . $res[0]->phone;
             $request->session()->put('sessionSignature', $session);
 
-
-
             echo 'yes';
         } else {
             Log::debug('DoLogin Failed: Wrong Password');
