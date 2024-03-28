@@ -102,7 +102,7 @@ class AuthController extends Controller {
 //        select all from table mt_user_reseller where email = $email mysql
         $res = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller WHERE email = "' . $payloadArray[0] . '"');
 
-        if (password_verify($payloadArray[1], $res[0]->password)) {
+        if (password_verify($payloadArray[1], $res[0]->password) && $res[0]->is_admin == 1) {
             $request->session()->put('sessionEmail', $payloadArray[0]);
             $request->session()->put('sessionId', $res[0]->id);
             $request->session()->put('sessionName', $res[0]->nama);
@@ -128,17 +128,7 @@ class AuthController extends Controller {
      * @return
      */
     public function logout(Request $request){
-        $grpcRootAdminWeb = new RootAdminWebServiceClient(RPCAddressRootAdmin, ['credentials' => ChannelCredentials::createInsecure()]);
-        $grpcRequest = new DoLogoutRequest();
-        $grpcRequest->setEmail($request->session()->get('sessionEmail'));
-
-        list($result, $status) = $grpcRootAdminWeb->DoLogout($grpcRequest)->wait();
-
-        $grpcHitStatus = $status->code;
-
-        Log::debug('DoLogout Hit Status: ' . $grpcHitStatus);
-        $respStatus = $result->getStatuscode();
-        Log::debug('Login Status Code: ' . $respStatus);
+        $request->session()->flush();
 
         Auth::logout();
         return redirect()->route('login')->with('error','Successfully Logged out !');
