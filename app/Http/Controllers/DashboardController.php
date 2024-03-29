@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Thread;
 
 class DashboardController extends Controller
 {
@@ -30,37 +31,46 @@ class DashboardController extends Controller
     }
 
     function nodes(Request $request) {
-        $title = "Nodes";
+        $title = "Nodes Management";
         $description = "Some description for the page";
 
-        $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device WHERE reseller_user_allocation = "' . $request->session()->get('sessionEmail') . '"');
+        $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device where is_active = 1');
+        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0');
 
         foreach ($nodes as $node) {
-            $curlHandle = curl_init();
-            curl_setopt($curlHandle, CURLOPT_URL, $node->url_health);
-            curl_setopt($curlHandle, CURLOPT_NOBODY, true);
-            curl_setopt($curlHandle, CURLOPT_HEADER, true);
-            curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curlHandle, CURLOPT_CONNECTTIMEOUT, 2);
-            curl_setopt($curlHandle, CURLOPT_TIMEOUT, 3); //timeout in seconds
-            $response = curl_exec($curlHandle);
-            preg_match('/ \d+ /', $response, $matches);
-            $header_size = curl_getinfo($curlHandle, CURLINFO_HEADER_SIZE);
-            $body = substr($response, $header_size);
-            $node->health = isset($matches[0]) ? "yes" : "no";
-            if ($matches[0] == 200) {
-                $node->is_scanned = 1;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $node->url_health);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 200);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, false);
+            $result = curl_exec($ch);
+            if (curl_errno($ch)) {
+                $result = curl_error($ch);
             }
-
-            curl_close($curlHandle);
+            curl_close($ch);
+            $node->health = $result;
         }
 
 //        dd($nodes);
 
-        return view('dashboard.nodes', compact('title', 'description'))->with('nodes', $nodes);
+        return view('dashboard.nodes', compact('title', 'description'))->with('nodes', $nodes)->with('user', $user);
     }
 
-    function socket(Request $request) {
+    function changeUser(Request $request) {
+
+        $id_device = $request->id;
+        $id_user = $request->email;
+
+        $res = DB::connection('mysql')->update('UPDATE mt_device SET reseller_user_allocation = ? WHERE id_device = ?', [$id_user, $id_device]);
+
+        if ($res == 1) {
+            echo 'success';
+        } else {
+            echo 'failed';
+        }
 
     }
 }

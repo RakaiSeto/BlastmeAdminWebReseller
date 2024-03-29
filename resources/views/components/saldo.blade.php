@@ -12,7 +12,7 @@
                       <div class=" ap-po-details-content d-flex flex-wrap justify-content-between">
                         <div class="ap-po-details__titlebar">
                           <h1>{{$saldo}}</h1>
-                          <p>Server Teralokasi ke Participant</p>
+                          <p>Nodes Teralokasi ke Participant</p>
                         </div>
                         <div class="ap-po-details__icon-area">
                           <div class="svg-icon order-bg-opacity-primary color-primary">

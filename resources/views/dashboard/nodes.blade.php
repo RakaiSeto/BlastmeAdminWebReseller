@@ -6,43 +6,36 @@
     <script src="http://neowa.krapoex.com:8083/assets/js/socket.io.js"></script>
     <script>
         $(document).ready(function () {
-            buttons = document.querySelectorAll('.btn-scan');
+            buttons = document.querySelectorAll('.btn-change-user');
             buttons.forEach(function (button) {
                 button.addEventListener('click', function (e) {
                     e.preventDefault();
 
                     //     get attribute data-url from button
-                    var url = $(this).data('url');
-                    //     get data-node-id from button
-                    var node_id = $(this).data('node-id');
+                    var id = $(this).data('id');
+                    var select = $(this).data('select');
 
-                    // add class 'show' to modal with id 'scan + node_id'
-                    $('#scan' + node_id).addClass('show');
-                    // add display block to modal with id 'scan + node_id'
-                    $('#scan' + node_id).css('display', 'block');
+                //     do ajax to '/change-node-user' with method post
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    })
 
-                    var socket = io(url)
+                    $.ajax({
+                        url: '/change-node-user',
+                        method: 'post',
+                        data: {
+                            id: id,
+                            email: $('#' + select).val()
+                        },
+                        success: function (response) {
+                            alert(response)
+                            $('#current' + id).html($('#' + select).val())
+                        }
 
-                    socket.on('connection', function (socket) {
-                        console.log("connc");
-                    });
 
-                    socket.on('message', function (msg) {
-                        $('#data_logs' + node_id).append($('<li class="list-group-item"">').text(msg));
-                    });
-
-                    socket.on('qr', function (src) {
-                        $('#qrcode' + node_id).attr('src', src);
-                        $('#qrcode' + node_id).show();
-                    });
-
-                    socket.on('ready', function (data) {
-                        $('#qrcode' + node_id).hide();
-                    });
-
-                    socket.on('authenticated', function (data) {
-                        $('#qrcode').hide();
-                    });
+                    })
                 })
             });
 
@@ -63,38 +56,6 @@
     </script>
 @endpush
 @section('content')
-    @foreach($nodes as $key => $node)
-        <div class="modal fade" id="scan{{$node->id_device}}" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="box-title">Scan Node {{$key + 1}}</h5>
-                        <a href="#" class="close close-node">
-                            <span class="close-node" data-idmodal="scan{{$node->id_device}}"
-                                  aria-hidden="true">&times;</span>
-                        </a>
-                    </div>
-                    <div class="modal-body">
-                        <div class="box-body">
-                            {{ csrf_field() }}
-                            <input type="hidden" id="tuClientId">
-                            <div class="form-group row">
-                                <img src="" alt="QR Code" id="qrcode{{$node->id_device}}" class="img-fluid">
-                            </div>
-
-                            <div class="form-group row">
-                                <p>Engine Logs : </p>
-                                <ul class="list-group" id="data_logs{{$node->id_device}}">
-
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    @endforeach
 
     <div class="crm mb-25">
         <div class="container-fluid">
@@ -133,48 +94,57 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Phone</th>
-                            <th scope="col">Scan</th>
+                            <th class="text-center" scope="col">#</th>
+                            <th class="text-center" scope="col">Code</th>
+                            <th class="text-center" scope="col">Status</th>
+                            <th class="text-center" scope="col">Allocation</th>
+                            <th class="text-center" scope="col">Manage Allocation</th>
+                            <th class="text-center" scope="col">Action</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            @foreach($nodes as $key => $node)
-                                <th scope="row">{{ $key+1 }}</th>
-                                <td>
-                                    @if($node->is_scanned == 1)
+                        @foreach($nodes as $key => $node)
+                            <tr>
+                                <th class="text-center" scope="row">{{ $key+1 }}</th>
+                                <td class="text-center">{{ $node->nama }}</td>
+                                <td class="text-center">
+                                    @if($node->health == "OK")
                                         <span
                                             class="rounded-pill bg-success text-bg-success flex-1 text-center text-white"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Active</span>
-                                    @elseif($node->health != 'yes')
-                                        <span
-                                            class="rounded-pill bg-danger text-bg-danger flex-1 text-center text-white"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Offline</span>
-                                    @else
+                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Scanned</span>
+                                    @elseif($node->health == "NOK" || $node->health == "NOKLOGIN")
                                         <span
                                             class="rounded-pill bg-warning text-bg-warning flex-1 text-center text-white"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Available</span>
+                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Not Scanned</span>
+                                    @else
+                                        <span
+                                            class="rounded-pill bg-dark text-bg-dark flex-1 text-center text-white"
+                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Service Down</span>
+
                                     @endif
                                 </td>
-                                <td>
-                                    @if($node->is_scanned == 1 && $node->health == 'yes')
-                                        {{ $node->phone }}
-                                    @endif
+                                <td class="text-center" id="current{{$node->id_device}}">
+                                    {{ $node->reseller_user_allocation }}
                                 </td>
-                                <td>
-                                    @if($node->is_scanned == 0 && $node->health == 'yes')
-                                        <a href="#" data-url="{{$node->url_socket}}" data-node-id="{{$node->id_device}}"
-                                           class="btn btn-sm btn-info flex-1 btn-scan"
-                                           style="font-size: 14px; padding: 0 6.64px; line-height: normal; height: 20px">Scan
-                                            Node</a>
-                                    @endif
+                                <td class="text-center">
+                                    <select class="form-select" id="user{{$node->id_device}}" aria-label="Default select example">
+                                        <option selected value="ROOT">ROOT</option>
+                                        @foreach($user as $u)
+                                            <option value="{{ $u->email }}">{{ $u->nama }} ({{ $u->email }})</option>
+                                        @endforeach
+                                    </select>
                                 </td>
-                        </tr>
+                                <td class="text-center">
+                                    <button data-id="{{$node->id_device}}" data-select="user{{$node->id_device}}"
+                                            class="btn btn-sm btn-info mx-auto btn-change-user"
+                                            style="font-size: 14px; padding: 0 6.64px; line-height: normal; height: 20px">
+                                        Save Changes
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
-                    @endforeach
                 </div>
             </div>
         </div>

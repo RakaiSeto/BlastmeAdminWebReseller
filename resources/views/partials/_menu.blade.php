@@ -9,7 +9,7 @@
         <li class="">
             <a href="/nodes" class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
                 <span class="nav-icon bi bi-hdd-rack"></span>
-                <span class="menu-text">Nodes</span>
+                <span class="menu-text">Nodes Management</span>
             </a>
         </li>
 

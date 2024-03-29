@@ -14,7 +14,8 @@
         "laravel/sanctum": "^2.14",
         "laravel/tinker": "^2.7",
         "ext-grpc": "*",
-      "ext-curl": "*"
+      "ext-curl": "*",
+      "ext-pthreads": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
