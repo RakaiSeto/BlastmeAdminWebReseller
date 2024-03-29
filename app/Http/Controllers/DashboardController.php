@@ -59,6 +59,34 @@ class DashboardController extends Controller
         return view('dashboard.nodes', compact('title', 'description'))->with('nodes', $nodes)->with('user', $user);
     }
 
+    function userManagement(Request $request) {
+        $title = "Participant Management";
+        $description = "Some description for the page";
+
+        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0');
+
+//        dd($nodes);
+
+        return view('dashboard.participant', compact('title', 'description'))->with('user', $user);
+    }
+    function userToggle(Request $request) {
+        $id_email = $request->id;
+
+        $nowStatus = DB::connection('mysql')->select('SELECT is_active FROM mt_user_reseller WHERE email = ?', [$id_email]);
+        if ($nowStatus[0]->is_active == 1) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+        $res = DB::connection('mysql')->update('UPDATE mt_user_reseller SET is_active = ? WHERE email = ?', [$status, $id_email]);
+
+        if ($res == 1) {
+            echo 'success';
+        } else {
+            echo 'failed';
+        }
+    }
+
     function changeUser(Request $request) {
 
         $id_device = $request->id;

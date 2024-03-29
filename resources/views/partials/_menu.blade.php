@@ -12,6 +12,12 @@
                 <span class="menu-text">Nodes Management</span>
             </a>
         </li>
+        <li class="">
+            <a href="/user-management" class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
+                <span class="nav-icon bi bi-people"></span>
+                <span class="menu-text">Participant Management</span>
+            </a>
+        </li>
 
         @if(Request::is(app()->getLocale().'/dashboards/demo-five'))
             <div class="card sidebar__feature shadow-none bg-transparent border-0 py-sm-50 px-sm-35 text-center">

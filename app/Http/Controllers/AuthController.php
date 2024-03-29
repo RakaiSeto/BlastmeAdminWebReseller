@@ -102,7 +102,10 @@ class AuthController extends Controller {
 //        select all from table mt_user_reseller where email = $email mysql
         $res = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller WHERE email = "' . $payloadArray[0] . '"');
 
-        if (password_verify($payloadArray[1], $res[0]->password) && $res[0]->is_admin == 1) {
+        if (count($res) == 0) {
+            Log::debug('DoLogin Failed: User Not Found');
+            echo 'user not found';
+        } elseif (password_verify($payloadArray[1], $res[0]->password) && $res[0]->is_admin == 1) {
             $request->session()->put('sessionEmail', $payloadArray[0]);
             $request->session()->put('sessionId', $res[0]->id);
             $request->session()->put('sessionName', $res[0]->nama);

@@ -29,6 +29,8 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/dashboard',[DashboardController::class,'index']);
     Route::get('/nodes',[DashboardController::class,'nodes']);
     Route::post('/change-node-user',[DashboardController::class,'changeUser']);
+    Route::get('/user-management',[DashboardController::class,'userManagement']);
+    Route::get('/toggle-user/{id}',[DashboardController::class,'userToggle']);
     Route::get('/tes', [DashboardController::class, 'socket']);
     Route::get('/logout',[AuthController::class,'logout'])->middleware('auth');
     Route::post('/logout',[AuthController::class,'logout'])->middleware('auth');
