@@ -107,8 +107,7 @@ class DashboardController extends Controller
         $email = $request->email;
         $phone = $request->phone;
 
-        $arrNama = explode(" ", $name);
-        $rawPassword = $phone . "_" . $arrNama[0];
+        $rawPassword = substr($phone, -6);
         $encPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
         $is_admin = 0;
         $is_active = 1;
