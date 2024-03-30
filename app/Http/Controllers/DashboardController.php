@@ -101,4 +101,24 @@ class DashboardController extends Controller
         }
 
     }
+
+    function addParticipant(Request $request) {
+        $name = $request->nama;
+        $email = $request->email;
+        $phone = $request->phone;
+
+        $arrNama = explode(" ", $name);
+        $rawPassword = $phone . "_" . $arrNama[0];
+        $encPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+        $is_admin = 0;
+        $is_active = 1;
+
+        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active) VALUES (?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active]);
+
+        if ($res == 1) {
+            echo 'success';
+        } else {
+            echo 'failed';
+        }
+    }
 }

@@ -56,7 +56,6 @@
     </script>
 @endpush
 @section('content')
-
     <div class="crm mb-25">
         <div class="container-fluid">
             <div class="row ">

@@ -44,7 +44,40 @@
                 })
             });
 
+        //     check if participantEmail, participantPhone, and participantNama is not empty
+            $('#participantEmail, #participantPhone, #participantNama').on('keyup', function () {
+                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '') {
+                    $('#btnSaveParticipant').prop('disabled', false)
+                } else {
+                    $('#btnSaveParticipant').prop('disabled', true)
+                }
+            })
 
+        //     when button save participant clicked do ajax to '/add-participant' with method post
+            $('#btnSaveParticipant').on('click', function () {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                })
+
+                $.ajax({
+                    url: '/add-participant',
+                    method: 'post',
+                    data: {
+                        email: $('#participantEmail').val(),
+                        phone: $('#participantPhone').val(),
+                        nama: $('#participantNama').val()
+                    },
+                    success: function (response) {
+                        if (response == 'success') {
+                            location.reload()
+                        } else {
+                            alert('Failed to add participant')
+                        }
+                    }
+                })
+            })
         });
         document.addEventListener("click", someListener);
 
@@ -61,16 +94,51 @@
     </script>
 @endpush
 @section('content')
+    <div class="modal fade" id="addParticipant" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="box-title">Add New Participant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Phone</label>
+                        <input type="number" class="form-control" id="participantPhone" placeholder="name@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="participantEmail" placeholder="name@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="participantNama" placeholder="name@example.com">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveParticipant" disabled>Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="crm mb-25">
         <div class="container-fluid">
-            <div class="row ">
-                <div class="col-lg-12">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
                     <div class="breadcrumb-main">
                         <h4 class="text-capitalize breadcrumb-title">{{$title}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="col-lg-4">
+                    <div class="w-100 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary btn-sm end-0" data-bs-toggle="modal" data-bs-target="#addParticipant">
+                        Add Participant
+                    </button>
+                    </div>
+                </div>
+                <div class="row justify-content-center flex-1 pe-0">
                     {{--                    @foreach($nodes as $key => $node)--}}
                     {{--                        <div class="col-lg-4 col-md-6">--}}
                     {{--                            <div class="card card-block card-stretch card-height nodes-card">--}}
@@ -96,7 +164,7 @@
                     {{--                            </div>--}}
                     {{--                        </div>--}}
                     {{--                    @endforeach--}}
-                    <table class="table table-striped">
+                    <table class="table table-striped w-100">
                         <thead>
                         <tr>
                             <th class="text-center" scope="col">#</th>
