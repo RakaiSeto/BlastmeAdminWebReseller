@@ -127,7 +127,7 @@
                                 </td>
                                 <td class="text-center">
                                     <select class="form-select" id="user{{$node->id_device}}" aria-label="Default select example">
-                                        <option selected value="ROOT">ROOT</option>
+                                        <option selected value="UNALOCATED">UNALOCATED</option>
                                         @foreach($user as $u)
                                             <option value="{{ $u->email }}">{{ $u->nama }} ({{ $u->email }})</option>
                                         @endforeach

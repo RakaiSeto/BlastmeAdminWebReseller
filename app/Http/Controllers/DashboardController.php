@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $title = "Nodes Management";
         $description = "Some description for the page";
 
-        $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device where is_active = 1');
+        $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device where is_active = 1 AND reseller_user_allocation != "ROOT"');
         $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0');
 
         foreach ($nodes as $node) {
