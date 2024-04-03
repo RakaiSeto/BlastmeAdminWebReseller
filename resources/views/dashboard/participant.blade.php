@@ -46,7 +46,7 @@
 
             //     check if participantEmail, participantPhone, and participantNama is not empty
             $('#participantEmail, #participantPhone, #participantNama, #participantFee').on('keyup', function () {
-                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '' && $('#participantFee').val() != 0) {
+                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '' && $('#participantFee').val() != 0 && $('#participantRek').val() != '') {
                     $('#btnSaveParticipant').prop('disabled', false)
                 } else {
                     $('#btnSaveParticipant').prop('disabled', true)
@@ -68,7 +68,8 @@
                         email: $('#participantEmail').val(),
                         phone: $('#participantPhone').val(),
                         nama: $('#participantNama').val(),
-                        fee: $('#participantFee').val()
+                        fee: $('#participantFee').val(),
+                        rek: $('#participantRek').val()
                     },
                     success: function (response) {
                         if (response == 'success') {
@@ -119,6 +120,10 @@
                         <label for="exampleFormControlInput1" class="form-label">Fee (if value is 10, then 90% of wallet
                             is for participant)</label>
                         <input type="number" class="form-control" id="participantFee" placeholder="10, 20, 30 etc">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Rekening ([bank/e-wallet] [accnum])</label>
+                        <input type="number" class="form-control" id="participantRek" placeholder="BCA 123456">
                     </div>
                 </div>
                 <div class="modal-footer">
