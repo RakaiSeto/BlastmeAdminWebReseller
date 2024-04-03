@@ -138,7 +138,7 @@ class DashboardController extends Controller
         $is_admin = 0;
         $is_active = 1;
 
-        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, fee) VALUES (?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, $fee]);
+        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, is_reseller, pic, reseller_upline, fee) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, 0, 0, $request->session()->get('sessionEmail'), $fee]);
 
         if ($res == 1) {
             echo 'success';
