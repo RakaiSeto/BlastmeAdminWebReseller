@@ -31,6 +31,7 @@ Route::group(['middleware'=>'auth'],function(){
     Route::post('/change-node-user',[DashboardController::class,'changeUser']);
     Route::post('/add-participant',[DashboardController::class,'addParticipant']);
     Route::get('/user-management',[DashboardController::class,'userManagement']);
+    Route::get('/user-wallet',[DashboardController::class,'walletManagement']);
     Route::get('/toggle-user/{id}',[DashboardController::class,'userToggle']);
     Route::get('/tes', [DashboardController::class, 'socket']);
     Route::get('/logout',[AuthController::class,'logout'])->middleware('auth');

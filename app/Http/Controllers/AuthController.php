@@ -105,11 +105,18 @@ class AuthController extends Controller {
         if (count($res) == 0) {
             Log::debug('DoLogin Failed: User Not Found');
             echo 'user not found';
-        } elseif (password_verify($payloadArray[1], $res[0]->password) && $res[0]->is_admin == 1) {
+        } elseif (password_verify($payloadArray[1], $res[0]->password) && ($res[0]->is_admin == 1 || $res[0]->is_reseller == 1)) {
             $request->session()->put('sessionEmail', $payloadArray[0]);
             $request->session()->put('sessionId', $res[0]->id);
             $request->session()->put('sessionName', $res[0]->nama);
             $request->session()->put('sessionPhone', $res[0]->phone);
+
+            if ($res[0]->is_admin == 1) {
+                $request->session()->put('sessionRole', 'admin');
+            } else {
+                $request->session()->put('sessionRole', 'reseller');
+            }
+
 
             $session = $payloadArray[0] . "|" . $res[0]->id . "|" . $res[0]->nama . "|" . $res[0]->phone;
             $request->session()->put('sessionSignature', $session);

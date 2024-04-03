@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Thread;
 
 class DashboardController extends Controller
 {
@@ -23,14 +22,35 @@ class DashboardController extends Controller
         $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0');
         $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
         $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
-
+        if ($request->session()->get('role') == 'admin') {
+            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller WHERE reseller_upline = ?', [$request->session()->get('email')]);
+        } else {
+            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller');
+        }
 
         $harini = 0;
 
-        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('trx_today', $trx_today[0]->count)->with('trx_all', $trx_all[0]->count);
+        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('trx_today', $trx_today[0]->count)->with('trx_all', $trx_all[0]->count)->with('saldoKolektif', $saldoKolektif[0]->count);
     }
 
-    function nodes(Request $request) {
+    function walletManagement(Request $request)
+    {
+        $title = "Participant Wallet";
+        $description = "Some description for the page";
+        $user = [];
+
+        $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_reseller = 1');
+
+        foreach ($allUser as $u) {
+            $res = DB::connection('mysql')->select("SELECT email, nama, phone, rekening, (SELECT sum(wallet) FROM mt_user_reseller where reseller_upline = ?) as wallet FROM mt_user_reseller where is_reseller = 1 and email = ?", [$u->email, $u->email]);
+            array_push($user, $res[0]);
+        }
+
+        return view('dashboard.wallet', compact('title', 'description'))->with('user', $user);
+    }
+
+    function nodes(Request $request)
+    {
         $title = "Nodes Management";
         $description = "Some description for the page";
 
@@ -59,7 +79,8 @@ class DashboardController extends Controller
         return view('dashboard.nodes', compact('title', 'description'))->with('nodes', $nodes)->with('user', $user);
     }
 
-    function userManagement(Request $request) {
+    function userManagement(Request $request)
+    {
         $title = "Participant Management";
         $description = "Some description for the page";
 
@@ -69,7 +90,9 @@ class DashboardController extends Controller
 
         return view('dashboard.participant', compact('title', 'description'))->with('user', $user);
     }
-    function userToggle(Request $request) {
+
+    function userToggle(Request $request)
+    {
         $id_email = $request->id;
 
         $nowStatus = DB::connection('mysql')->select('SELECT is_active FROM mt_user_reseller WHERE email = ?', [$id_email]);
@@ -87,7 +110,8 @@ class DashboardController extends Controller
         }
     }
 
-    function changeUser(Request $request) {
+    function changeUser(Request $request)
+    {
 
         $id_device = $request->id;
         $id_user = $request->email;
@@ -102,7 +126,8 @@ class DashboardController extends Controller
 
     }
 
-    function addParticipant(Request $request) {
+    function addParticipant(Request $request)
+    {
         $name = $request->nama;
         $email = $request->email;
         $phone = $request->phone;

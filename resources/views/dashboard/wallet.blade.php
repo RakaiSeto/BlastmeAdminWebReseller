@@ -131,13 +131,13 @@
                         <h4 class="text-capitalize breadcrumb-title">{{$title}}
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="w-100 d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary btn-sm end-0" data-bs-toggle="modal" data-bs-target="#addParticipant">
-                        Add Participant
-                    </button>
-                    </div>
-                </div>
+{{--                <div class="col-lg-4">--}}
+{{--                    <div class="w-100 d-flex justify-content-end">--}}
+{{--                    <button type="button" class="btn btn-primary btn-sm end-0" data-bs-toggle="modal" data-bs-target="#addParticipant">--}}
+{{--                        Add Participant--}}
+{{--                    </button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
                 <div class="row justify-content-center flex-1 pe-0">
                     {{--                    @foreach($nodes as $key => $node)--}}
                     {{--                        <div class="col-lg-4 col-md-6">--}}
@@ -169,11 +169,10 @@
                         <tr>
                             <th class="text-center" scope="col">#</th>
                             <th class="text-center" scope="col">Email</th>
-                            <th class="text-center" scope="col">Phone</th>
                             <th class="text-center" scope="col">Name</th>
+                            <th class="text-center" scope="col">Phone</th>
                             <th class="text-center" scope="col">Rekening</th>
-                            <th class="text-center" scope="col">Is Active</th>
-                            <th class="text-center" scope="col">Action</th>
+                            <th class="text-center" scope="col">Collective Wallet</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -191,22 +190,7 @@
                                     {{ $u->rekening }}
                                 </td>
                                 <td class="text-center">
-                                    @if($u->is_active == 1)
-                                        <span
-                                            class="rounded-pill bg-success text-bg-success flex-1 text-center text-white" id="togglestatus{{$u->id}}"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Active</span>
-                                    @else
-                                        <span
-                                            class="rounded-pill bg-danger text-bg-danger flex-1 text-center text-white" id="togglestatus{{$u->id}}"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: 20px; height: 20px">Nonactive</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    <button data-id="{{$u->email}}" data-the-id="{{$u->id}}"
-                                            class="btn btn-sm btn-info mx-auto btn-toggle"
-                                            style="font-size: 14px; padding: 0 6.64px; line-height: normal; height: 20px">
-                                        Toggle Active
-                                    </button>
+                                    Rp. {{ number_format($u->wallet) }}
                                 </td>
                             </tr>
                         @endforeach
