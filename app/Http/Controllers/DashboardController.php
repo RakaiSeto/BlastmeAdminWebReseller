@@ -84,7 +84,7 @@ class DashboardController extends Controller
         $title = "Participant Management";
         $description = "Some description for the page";
 
-        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0');
+        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where reseller_upline = ?', [$request->session()->get('sessionEmail')]);
 
 //        dd($nodes);
 
