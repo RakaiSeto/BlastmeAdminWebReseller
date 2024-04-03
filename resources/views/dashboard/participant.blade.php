@@ -123,7 +123,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Rekening ([bank/e-wallet] [accnum])</label>
-                        <input type="number" class="form-control" id="participantRek" placeholder="BCA 123456">
+                        <input type="text" class="form-control" id="participantRek" placeholder="BCA 123456">
                     </div>
                 </div>
                 <div class="modal-footer">
