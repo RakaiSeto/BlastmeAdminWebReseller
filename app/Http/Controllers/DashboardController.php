@@ -131,13 +131,14 @@ class DashboardController extends Controller
         $name = $request->nama;
         $email = $request->email;
         $phone = $request->phone;
+        $fee = $request->fee;
 
         $rawPassword = substr($phone, -6);
         $encPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
         $is_admin = 0;
         $is_active = 1;
 
-        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active) VALUES (?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active]);
+        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, fee) VALUES (?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, $fee]);
 
         if ($res == 1) {
             echo 'success';
