@@ -224,7 +224,7 @@
                                 </td>
                                 <td class="text-center">
                                     <button data-id="{{$u->email}}" data-the-id="{{$u->id}}"
-                                            class="btn btn-sm btn-info mx-auto btn-toggle"
+                                            class="btn btn-sm btn-info mx-auto btn-toggle text-nowrap"
                                             style="font-size: 14px; padding: 0 6.64px; line-height: normal; height: 20px">
                                         Toggle Active
                                     </button>
