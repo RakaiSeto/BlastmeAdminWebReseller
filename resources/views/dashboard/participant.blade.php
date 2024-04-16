@@ -122,7 +122,8 @@
                         <input type="number" class="form-control" id="participantFee" placeholder="10, 20, 30 etc">
                     </div>
                     <div class="mb-3">
-                        <label for="exampleFormControlInput1" class="form-label">Rekening ([bank/e-wallet] [accnum])</label>
+                        <label for="exampleFormControlInput1" class="form-label">Rekening ([bank/e-wallet]
+                            [accnum])</label>
                         <input type="text" class="form-control" id="participantRek" placeholder="BCA 123456">
                     </div>
                 </div>
@@ -209,10 +210,19 @@
                                     Rp. {{ number_format($u->wallet) }}
                                 </td>
                                 <td class="text-center">
-                                    ({{$u->fee}}%) Rp. {{ number_format($u->wallet * (100/$u->fee / 100)) }}
+                                    @if($u->fee == 0)
+                                        ({{$u->fee}}%) Rp. {{ number_format($u->wallet * 0) }}
+                                    @else
+                                    ({{$u->fee}}%)
+                                        Rp. {{ number_format($u->wallet * (100/$u->fee / 100)) }}
+                                    @endif
                                 </td>
                                 <td class="text-center">
-                                    Rp. {{ number_format($u->wallet - ($u->wallet * (100/$u->fee / 100))) }}
+                                    @if($u->fee == 0)
+                                        Rp. {{ number_format($u->wallet) }}
+                                    @else
+                                        Rp. {{ number_format($u->wallet - ($u->wallet * (100/$u->fee / 100))) }}
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if($u->is_active == 1)
