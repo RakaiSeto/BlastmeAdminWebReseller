@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $description = "Some description for the page";
 
         $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device where is_active = 1 AND reseller_user_allocation != "ROOT"');
-        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0');
+        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0 AND is_reseller = 0 AND reseller_upline = ?', [$request->session()->get('sessionEmail')]);
 
         foreach ($nodes as $node) {
             $ch = curl_init();
