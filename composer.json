@@ -8,12 +8,10 @@
         "php": "^8.0",
         "fruitcake/laravel-cors": "^2.0.5",
         "google/protobuf": "^3.17",
-        "grpc/grpc": "^1.38",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.52",
         "laravel/sanctum": "^2.14",
         "laravel/tinker": "^2.7",
-        "ext-grpc": "*",
       "ext-curl": "*",
       "ext-pthreads": "*"
     },
