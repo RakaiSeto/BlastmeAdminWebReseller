@@ -18,14 +18,14 @@ class DashboardController extends Controller
         $title = "Dashboard";
         $description = "Some description for the page";
 
-        $res = DB::select('SELECT COUNT(id_device) as count FROM mt_device WHERE reseller_user_allocation != "ROOT"');
-        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0');
-        $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
-        $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
-        if ($request->session()->get('role') == 'admin') {
+        $res = DB::select('SELECT COUNT(id_device) as count FROM mt_device WHERE reseller_user_allocation != "ROOT" AND pic = ?', [$request->session()->get('sessionPic')]);
+        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0 AND pic = ?', [$request->session()->get('sessionPic')]);
+//        $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
+//        $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
+        if ($request->session()->get('role') == 'reseller') {
             $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller WHERE reseller_upline = ?', [$request->session()->get('email')]);
         } else {
-            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller');
+            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller WHERE pic = ?', [$request->session()->get('sessionPic')]);
         }
 
         $harini = 0;
@@ -39,10 +39,10 @@ class DashboardController extends Controller
         $description = "Some description for the page";
         $user = [];
 
-        $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_reseller = 1');
+        $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_reseller = 1 and pic = ?', [$request->session()->get('sessionPic')]);
 
         foreach ($allUser as $u) {
-            $res = DB::connection('mysql')->select("SELECT email, nama, phone, rekening, (SELECT sum(wallet) FROM mt_user_reseller where reseller_upline = ?) as wallet FROM mt_user_reseller where is_reseller = 1 and email = ?", [$u->email, $u->email]);
+            $res = DB::connection('mysql')->select("SELECT email, nama, phone, rekening, (SELECT sum(wallet) FROM mt_user_reseller where reseller_upline = ?) as wallet FROM mt_user_reseller where is_reseller = 1 and email = ? and pic = ?", [$u->email, $u->email, $u->pic]);
             array_push($user, $res[0]);
         }
 

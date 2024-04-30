@@ -110,6 +110,7 @@ class AuthController extends Controller {
             $request->session()->put('sessionId', $res[0]->id);
             $request->session()->put('sessionName', $res[0]->nama);
             $request->session()->put('sessionPhone', $res[0]->phone);
+            $request->session()->put('sessionPic', $res[0]->pic);
 
             if ($res[0]->is_admin == 1) {
                 $request->session()->put('sessionRole', 'admin');
