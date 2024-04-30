@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
     function walletManagement(Request $request)
     {
-        $title = "Participant Wallet";
+        $title = "Reseller Wallet";
         $description = "Some description for the page";
         $user = [];
 
