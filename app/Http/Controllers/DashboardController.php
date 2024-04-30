@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
         $harini = 0;
 
-        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('trx_today', $trx_today[0]->count)->with('trx_all', $trx_all[0]->count)->with('saldoKolektif', $saldoKolektif[0]->count);
+        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('saldoKolektif', $saldoKolektif[0]->count);
     }
 
     function walletManagement(Request $request)
