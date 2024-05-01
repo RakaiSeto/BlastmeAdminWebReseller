@@ -147,4 +147,34 @@ class DashboardController extends Controller
             echo 'failed';
         }
     }
+
+    function monitor(Request $request)
+    {
+        $title = "Nodes Monitoring";
+        $description = "Some description for the page";
+
+        $nodes = DB::connection('mysql')->select('SELECT * FROM mt_device where is_active = 1 AND reseller_user_allocation != "ROOT" and pic = ?', [$request->session()->get('sessionPic')]);
+//        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_admin = 0 AND is_reseller = 0 AND reseller_upline = ?', [$request->session()->get('sessionEmail')]);
+
+        foreach ($nodes as $node) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $node->url_health);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 200);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, false);
+            $result = curl_exec($ch);
+            if (curl_errno($ch)) {
+                $result = curl_error($ch);
+            }
+            curl_close($ch);
+            $node->health = $result;
+        }
+
+//        dd($nodes);
+
+        return view('dashboard.monitor', compact('title', 'description'))->with('nodes', $nodes)->with('user', $user);
+    }
 }
