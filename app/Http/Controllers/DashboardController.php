@@ -175,6 +175,6 @@ class DashboardController extends Controller
 
 //        dd($nodes);
 
-        return view('dashboard.monitor', compact('title', 'description'))->with('nodes', $nodes)->with('user', $user);
+        return view('dashboard.monitor', compact('title', 'description'))->with('nodes', $nodes);
     }
 }
