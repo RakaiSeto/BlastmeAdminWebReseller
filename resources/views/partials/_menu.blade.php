@@ -18,6 +18,13 @@
             </li>
         @else
             <li class="">
+                <a href="/user-management"
+                   class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
+                    <span class="nav-icon bi bi-people"></span>
+                    <span class="menu-text">Participant Management</span>
+                </a>
+            </li>
+            <li class="">
                 <a href="/nodes" class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
                     <span class="nav-icon bi bi-hdd-rack"></span>
                     <span class="menu-text">Nodes Management</span>
@@ -27,13 +34,6 @@
                 <a href="/monitor" class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
                     <span class="nav-icon bi bi-display"></span>
                     <span class="menu-text">Nodes Monitoring</span>
-                </a>
-            </li>
-            <li class="">
-                <a href="/user-management"
-                   class="{{ Request::is(app()->getLocale().'/applications/user/*') ? 'active':'' }}">
-                    <span class="nav-icon bi bi-people"></span>
-                    <span class="menu-text">Participant Management</span>
                 </a>
             </li>
         @endif
