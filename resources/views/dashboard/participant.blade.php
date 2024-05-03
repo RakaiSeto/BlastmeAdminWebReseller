@@ -45,8 +45,8 @@
             });
 
             //     check if participantEmail, participantPhone, and participantNama is not empty
-            $('#participantEmail, #participantPhone, #participantNama').on('keyup', function () {
-                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '' && $('#participantFee').val() != 0) {
+            $('#participantEmail, #participantPhone, #participantNama, #participantFee').on('keyup', function () {
+                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '') {
                     $('#btnSaveParticipant').prop('disabled', false)
                 } else {
                     $('#btnSaveParticipant').prop('disabled', true)
