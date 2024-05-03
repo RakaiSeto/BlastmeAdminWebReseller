@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $description = "Some description for the page";
 
         $res = DB::select('SELECT COUNT(id_device) as count FROM mt_device WHERE reseller_user_allocation != "ROOT" AND pic = ?', [$request->session()->get('sessionPic')]);
-        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0 AND pic = ?', [$request->session()->get('sessionPic')]);
+        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0 and is_reseller = 0 AND pic = ?', [$request->session()->get('sessionPic')]);
 //        $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
 //        $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
         if ($request->session()->get('role') == 'reseller') {
@@ -139,7 +139,7 @@ class DashboardController extends Controller
         $is_admin = 0;
         $is_active = 1;
 
-        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, is_reseller, pic, reseller_upline, fee, rekening) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, 0, 0, $request->session()->get('sessionEmail'), $fee, $rek]);
+        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, is_reseller, pic, reseller_upline, fee, rekening) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, 0, $request->session()->get('sessionPic'), $request->session()->get('sessionEmail'), $fee, $rek]);
 
         if ($res == 1) {
             echo 'success';
