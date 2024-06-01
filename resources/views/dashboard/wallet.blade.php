@@ -45,8 +45,8 @@
             });
 
         //     check if participantEmail, participantPhone, and participantNama is not empty
-            $('#participantEmail, #participantPhone, #participantNama').on('keyup', function () {
-                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '') {
+            $('#participantEmail, #participantPhone, #participantNama, #feePrincipal, #feeReseller, #feeParticipant, #rekening').on('keyup', function () {
+                if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '' && $('#rekening').val() != '') {
                     $('#btnSaveParticipant').prop('disabled', false)
                 } else {
                     $('#btnSaveParticipant').prop('disabled', true)
@@ -62,18 +62,22 @@
                 })
 
                 $.ajax({
-                    url: '/add-participant',
+                    url: '/add-principal',
                     method: 'post',
                     data: {
                         email: $('#participantEmail').val(),
                         phone: $('#participantPhone').val(),
-                        nama: $('#participantNama').val()
+                        nama: $('#participantNama').val(),
+                        feePrincipal: $('#feePrincipal').val(),
+                        feeReseller: $('#feeReseller').val(),
+                        feeParticipant: $('#feeParticipant').val(),
+                        rek: $('#rekening').val()
                     },
                     success: function (response) {
                         if (response == 'success') {
                             location.reload()
                         } else {
-                            alert('Failed to add participant')
+                            alert('Failed to add principal')
                         }
                     }
                 })
@@ -114,6 +118,22 @@
                         <label for="exampleFormControlInput1" class="form-label">Nama</label>
                         <input type="text" class="form-control" id="participantNama" placeholder="name@example.com">
                     </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Fee Principal</label>
+                        <input type="number" class="form-control" id="feePrincipal" placeholder="in rupiah">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Fee Reseller</label>
+                        <input type="number" class="form-control" id="feeReseller" placeholder="in rupiah">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Fee Participant</label>
+                        <input type="number" class="form-control" id="feeParticipant" placeholder="in rupiah">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Rekening</label>
+                        <input type="text" class="form-control" id="rekening" placeholder="BCA 12345678">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -131,13 +151,13 @@
                         <h4 class="text-capitalize breadcrumb-title">{{$title}}
                     </div>
                 </div>
-{{--                <div class="col-lg-4">--}}
-{{--                    <div class="w-100 d-flex justify-content-end">--}}
-{{--                    <button type="button" class="btn btn-primary btn-sm end-0" data-bs-toggle="modal" data-bs-target="#addParticipant">--}}
-{{--                        Add Participant--}}
-{{--                    </button>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
+                <div class="col-lg-4">
+                    <div class="w-100 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary btn-sm end-0" data-bs-toggle="modal" data-bs-target="#addParticipant">
+                        Add Principal
+                    </button>
+                    </div>
+                </div>
                 <div class="row justify-content-center flex-1 pe-0">
                     {{--                    @foreach($nodes as $key => $node)--}}
                     {{--                        <div class="col-lg-4 col-md-6">--}}
@@ -169,8 +189,11 @@
                         <tr>
                             <th class="text-center" scope="col">#</th>
                             <th class="text-center" scope="col">Email</th>
-                            <th class="text-center" scope="col">Name</th>
                             <th class="text-center" scope="col">Phone</th>
+                            <th class="text-center" scope="col">Name</th>
+                            <th class="text-center" scope="col">Fee Principal</th>
+                            <th class="text-center" scope="col">Fee Reseller</th>
+                            <th class="text-center" scope="col">Fee Participant</th>
                             <th class="text-center" scope="col">Rekening</th>
                             <th class="text-center" scope="col">Collective Wallet</th>
                         </tr>
@@ -186,6 +209,16 @@
                                 <td class="text-center">
                                     {{ $u->nama }}
                                 </td>
+                                <td class="text-center">
+                                   Rp.  {{ $u->fee_principal }}
+                                </td>
+                                <td class="text-center">
+                                    Rp. {{ $u->fee_reseller }}
+                                </td>
+                                <td class="text-center">
+                                    Rp. {{ $u->fee_participant }}
+                                </td>
+
                                 <td class="text-center">
                                     {{ $u->rekening }}
                                 </td>

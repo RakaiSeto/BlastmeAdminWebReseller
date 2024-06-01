@@ -18,32 +18,42 @@ class DashboardController extends Controller
         $title = "Dashboard";
         $description = "Some description for the page";
 
-        $res = DB::select('SELECT COUNT(id_device) as count FROM mt_device WHERE reseller_user_allocation != "ROOT" AND pic = ?', [$request->session()->get('sessionPic')]);
-        $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller WHERE is_admin = 0 and is_reseller = 0 AND pic = ?', [$request->session()->get('sessionPic')]);
+        $participant = [];
+        if ($request->session()->get('sessionRole') == 'ROOT_ADMIN') {
+            $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller_new WHERE role = ?', ['PARTICIPANT']);
+        } else if ($request->session()->get('sessionRole') == 'PRINCIPAL') {
+            $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller_new WHERE role = ? AND principal_upline = ?', ['PARTICIPANT', $request->session()->get('sessionEmail')]);
+        } else if ($request->session()->get('sessionRole') == 'RESELLER') {
+            $participant = DB::select('SELECT COUNT(id) as count FROM mt_user_reseller_new WHERE role = ? AND reseller_upline = ?', ['PARTICIPANT', $request->session()->get('sessionEmail')]);
+        }
 //        $trx_today = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE DATE(date) = CURDATE() and participant_email != ""');
 //        $trx_all = DB::select('SELECT COUNT(message_id) as count FROM transaction_wa WHERE participant_email != ""');
-        if ($request->session()->get('role') == 'reseller') {
-            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller WHERE reseller_upline = ?', [$request->session()->get('email')]);
-        } else {
-            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller WHERE pic = ?', [$request->session()->get('sessionPic')]);
+
+        $saldoKolektif = [];
+        if ($request->session()->get('sessionRole') == 'ROOT_ADMIN') {
+            $saldoKolektif = DB::select('SELECT SUM(wallet) as count FROM mt_user_reseller_new', []);
+        } else if ($request->session()->get('sessionRole') == 'PRINCIPAL' || $request->session()->get('sessionRole') == 'RESELLER') {
+            $saldoKolektif = DB::select('SELECT wallet as count FROM mt_user_reseller_new WHERE email = ?', [$request->session()->get('sessionEmail')]);
         }
 
         $harini = 0;
 
-        return view('dashboard.index', compact('title', 'description'))->with('saldo', $res[0]->count)->with('hariini', $harini)->with('participant', $participant[0]->count)->with('saldoKolektif', $saldoKolektif[0]->count);
+        return view('dashboard.index', compact('title', 'description'))->with('hariini', $harini)->with('participant', $participant[0]->count)->with('saldoKolektif', $saldoKolektif[0]->count);
     }
 
     function walletManagement(Request $request)
     {
-        $title = "Reseller Wallet";
+        $title = "Principal";
         $description = "Some description for the page";
         $user = [];
 
-        $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where is_reseller = 1 and pic = ?', [$request->session()->get('sessionPic')]);
+        $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller_new WHERE role = ? ORDER BY nama ASC', ['PRINCIPAL']);
 
         foreach ($allUser as $u) {
-            $res = DB::connection('mysql')->select("SELECT email, nama, phone, rekening, (SELECT sum(wallet) FROM mt_user_reseller where reseller_upline = ?) as wallet FROM mt_user_reseller where is_reseller = 1 and email = ? and pic = ?", [$u->email, $u->email, $u->pic]);
-            array_push($user, $res[0]);
+            $res = DB::connection('mysql')->select("SELECT email, nama, phone, rekening, fee_principal, fee_reseller, fee_participant, (SELECT sum(wallet) FROM mt_user_reseller_new where principal_upline = ?) as wallet FROM mt_user_reseller_new where role = ? and email = ?", [$u->email, 'PRINCIPAL', $u->email]);
+            if (count($res) > 0) {
+                array_push($user, $res[0]);
+            }
         }
 
         return view('dashboard.wallet', compact('title', 'description'))->with('user', $user);
@@ -84,7 +94,19 @@ class DashboardController extends Controller
         $title = "Participant Management";
         $description = "Some description for the page";
 
-        $user = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller where reseller_upline = ?', [$request->session()->get('sessionEmail')]);
+        $alluser = [];
+        $user = [];
+        if ($request->session()->get('sessionRole') == 'PRINCIPAL') {
+            $allUser = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller_new WHERE role = ? AND principal_upline = ? ORDER BY nama ASC', ['RESELLER', $request->session()->get('sessionEmail')]);
+            foreach ($allUser as $u) {
+                $res = DB::connection('mysql')->select("SELECT id, email, nama, phone, rekening, (SELECT sum(wallet) FROM mt_user_reseller_new where reseller_upline = ?) as wallet, is_active FROM mt_user_reseller_new where role = ? and email = ?", [$u->email, 'RESELLER', $u->email]);
+                if (count($res) > 0) {
+                    array_push($user, $res[0]);
+                }
+            }
+        } else {
+            $user = DB::connection('mysql')->select("SELECT id, email, nama, phone, rekening, wallet, is_active FROM mt_user_reseller_new where role = ? and reseller_upline = ?", ['PARTICIPANT', $request->session()->get('sessionEmail')]);
+        }
 
 //        dd($nodes);
 
@@ -131,16 +153,43 @@ class DashboardController extends Controller
         $name = $request->nama;
         $email = $request->email;
         $phone = $request->phone;
-        $fee = $request->fee;
         $rek = $request->rek;
 
         $rawPassword = substr($phone, -6);
         $encPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
-        $is_admin = 0;
         $is_active = 1;
 
-        $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller (nama, email, phone, password, is_admin, is_active, is_reseller, pic, reseller_upline, fee, rekening) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, $is_admin, $is_active, 0, $request->session()->get('sessionPic'), $request->session()->get('sessionEmail'), $fee, $rek]);
+        $res = 0;
+        if ($request->session()->get('sessionRole') == 'PRINCIPAL') {
+            $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller_new(nama, email, phone, password, role, is_active, principal_upline, reseller_upline, rekening) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, 'RESELLER', $is_active, $request->session()->get('sessionEmail'), $email, $rek]);
+        } else if ($request->session()->get('sessionRole') == 'RESELLER') {
+            $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller_new(nama, email, phone, password, role, is_active, principal_upline, reseller_upline, rekening) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, 'PARTICIPANT', $is_active, $request->session()->get('sessionPrincipalUpline'), $request->session()->get('sessionEmail'), $rek]);
+        }
+        if ($res == 1) {
+            echo 'success';
+        } else {
+            echo 'failed';
+        }
+    }
 
+    function addPrincipal(Request $request)
+    {
+        $name = $request->nama;
+        $email = $request->email;
+        $phone = $request->phone;
+        $feePrincipal = $request->feePrincipal;
+        $feeReseller = $request->feeReseller;
+        $feeParticipant = $request->feeParticipant;
+        $rek = $request->rek;
+
+        $rawPassword = substr($phone, -6);
+        $encPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+        $is_active = 1;
+
+        $res = 0;
+        if ($request->session()->get('sessionRole') == 'ROOT_ADMIN') {
+            $res = DB::connection('mysql')->insert('INSERT INTO mt_user_reseller_new(nama, email, phone, password, role, is_active, fee_principal, fee_reseller, fee_participant, rekening, principal_upline) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$name, $email, $phone, $encPassword, 'PRINCIPAL', $is_active, $feePrincipal, $feeReseller, $feeParticipant, $rek, $email]);
+        }
         if ($res == 1) {
             echo 'success';
         } else {

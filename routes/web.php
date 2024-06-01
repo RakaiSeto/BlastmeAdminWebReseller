@@ -31,6 +31,7 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/monitor',[DashboardController::class,'monitor']);
     Route::post('/change-node-user',[DashboardController::class,'changeUser']);
     Route::post('/add-participant',[DashboardController::class,'addParticipant']);
+    Route::post('/add-principal',[DashboardController::class,'addPrincipal']);
     Route::get('/user-management',[DashboardController::class,'userManagement']);
     Route::get('/user-wallet',[DashboardController::class,'walletManagement']);
     Route::get('/toggle-user/{id}',[DashboardController::class,'userToggle']);

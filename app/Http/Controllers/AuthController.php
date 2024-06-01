@@ -100,22 +100,26 @@ class AuthController extends Controller {
         $payloadArray = json_decode($request->getContent(), true);
 
 //        select all from table mt_user_reseller where email = $email mysql
-        $res = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller WHERE email = "' . $payloadArray[0] . '"');
+        $res = DB::connection('mysql')->select('SELECT * FROM mt_user_reseller_new WHERE email = "' . $payloadArray[0] . '"');
 
         if (count($res) == 0) {
             Log::debug('DoLogin Failed: User Not Found');
             echo 'user not found';
-        } elseif (password_verify($payloadArray[1], $res[0]->password) && ($res[0]->is_admin == 1 || $res[0]->is_reseller == 1)) {
+        } elseif (password_verify($payloadArray[1], $res[0]->password) && ($res[0]->role != "PARTICIPANT")) {
             $request->session()->put('sessionEmail', $payloadArray[0]);
             $request->session()->put('sessionId', $res[0]->id);
             $request->session()->put('sessionName', $res[0]->nama);
             $request->session()->put('sessionPhone', $res[0]->phone);
             $request->session()->put('sessionPic', $res[0]->pic);
+            $request->session()->put('sessionPrincipalUpline', $res[0]->principal_upline);
+            $request->session()->put('sessionResellerUpline', $res[0]->reseller_upline);
 
-            if ($res[0]->is_admin == 1) {
-                $request->session()->put('sessionRole', 'admin');
-            } else {
-                $request->session()->put('sessionRole', 'reseller');
+            if ($res[0]->role == "ROOT_ADMIN") {
+                $request->session()->put('sessionRole', 'ROOT_ADMIN');
+            } else if ($res[0]->role == "PRINCIPAL") {
+                $request->session()->put('sessionRole', 'PRINCIPAL');
+            } else if ($res[0]->role == "RESELLER") {
+                $request->session()->put('sessionRole', 'RESELLER');
             }
 
 

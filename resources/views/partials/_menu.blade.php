@@ -7,7 +7,7 @@
             </a>
         </li>
 
-        @if(session('sessionRole') == 'admin')
+        @if(session('sessionRole') == 'ROOT_ADMIN')
             <li class="">
 
                 <a href="/user-wallet"

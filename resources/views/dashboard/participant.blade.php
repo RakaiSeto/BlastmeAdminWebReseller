@@ -45,7 +45,7 @@
             });
 
             //     check if participantEmail, participantPhone, and participantNama is not empty
-            $('#participantEmail, #participantPhone, #participantNama, #participantFee').on('keyup', function () {
+            $('#participantEmail, #participantPhone, #participantNama').on('keyup', function () {
                 if ($('#participantEmail').val() != '' && $('#participantPhone').val() != '' && $('#participantNama').val() != '') {
                     $('#btnSaveParticipant').prop('disabled', false)
                 } else {
@@ -68,7 +68,6 @@
                         email: $('#participantEmail').val(),
                         phone: $('#participantPhone').val(),
                         nama: $('#participantNama').val(),
-                        fee: $('#participantFee').val(),
                         rek: $('#participantRek').val()
                     },
                     success: function (response) {
@@ -115,11 +114,6 @@
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Nama</label>
                         <input type="text" class="form-control" id="participantNama" placeholder="name@example.com">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleFormControlInput1" class="form-label">Fee (if value is 10, then 90% of wallet
-                            is for participant)</label>
-                        <input type="number" class="form-control" id="participantFee" placeholder="10, 20, 30 etc">
                     </div>
                     <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Rekening ([bank/e-wallet]
@@ -185,9 +179,7 @@
                             <th class="text-center" scope="col">Phone</th>
                             <th class="text-center" scope="col">Name</th>
                             <th class="text-center" scope="col">Rekening</th>
-                            <th class="text-center" scope="col">Wallet</th>
-                            <th class="text-center" scope="col">Fee</th>
-                            <th class="text-center" scope="col">After Fee</th>
+                            <th class="text-center" scope="col">Collective Wallet</th>
                             <th class="text-center" scope="col">Is Active</th>
                             <th class="text-center" scope="col">Action</th>
                         </tr>
@@ -208,21 +200,6 @@
                                 </td>
                                 <td class="text-center">
                                     Rp. {{ number_format($u->wallet) }}
-                                </td>
-                                <td class="text-center">
-                                    @if($u->fee == 0)
-                                        ({{$u->fee}}%) Rp. {{ number_format($u->wallet * 0) }}
-                                    @else
-                                    ({{$u->fee}}%)
-                                        Rp. {{ number_format($u->wallet * $u->fee/100) }}
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    @if($u->fee == 0)
-                                        Rp. {{ number_format($u->wallet) }}
-                                    @else
-                                        Rp. {{ number_format($u->wallet - ($u->wallet * $u->fee/100)) }}
-                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if($u->is_active == 1)
